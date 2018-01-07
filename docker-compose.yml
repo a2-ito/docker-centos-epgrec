@@ -1,0 +1,42 @@
+version: '2'
+services:
+  mysqldata:
+    image: busybox
+    container_name: epgrec-mysqldata
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+  wwwdata:
+    image: busybox
+    container_name: epgrec-wwwdata
+    volumes:
+      - ./data/www:/var/www/html
+
+  mysql:
+    image: mysql:latest
+    container_name: epgrec-mysql
+    volumes_from:
+      - mysqldata
+    environment:
+      MYSQL_USER: epgrec
+      MYSQL_PASSWORD: epgrec
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: epgrec
+      TZ: "Asia/Tokyo"
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --sql-mode=""
+
+  epgrec-centos: 
+    container_name: epgrec-centos
+    build: ./epgrec-centos
+    privileged: true
+    ports: 
+      - "80:80"
+    links: 
+      - mysql
+    volumes:
+      - ./epgrec-centos/nginx.conf:/etc/nginx/nginx.conf
+      - /mnt/sharerdvol/:/mnt/sharerdvol/
+      - /dev/:/dev/
+    volumes_from:
+      - wwwdata
+    environment:
+      TZ: Asia/Tokyo

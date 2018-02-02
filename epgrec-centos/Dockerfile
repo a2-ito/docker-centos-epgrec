@@ -2,6 +2,9 @@ FROM docker.io/centos:latest
 
 RUN yum update -y
 RUN yum -y install epel-release openssh-clients openssh-server;
+
+RUN useradd -d /home/nginx -m -s /bin/bash nginx
+RUN echo "export LANG=ja_JP.UTF-8" >> /home/nginx/.bash_profile
 RUN yum -y install nginx
 
 RUN yum -y install at php-cli php-fpm php-mbstring php-mysql php-process
@@ -15,10 +18,10 @@ RUN yum -y reinstall glibc-common
 
 ADD ./epgdump /tmp/epgdump
 
+RUN usermod -s /bin/bash nginx
+
 RUN localedef -v -c -i ja_JP -f UTF-8 ja_JP.UTF-8; echo "";
 ENV LANG ja_JP.UTF-8
-
-RUN usermod -s /bin/bash nginx
 
 RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/var\/run\/php-fpm\/php-fpm.sock/' /etc/php-fpm.d/www.conf
 RUN sed -i 's/user = apache/user = nginx/' /etc/php-fpm.d/www.conf

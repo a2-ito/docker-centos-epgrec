@@ -40,3 +40,4 @@ services:
       - wwwdata
     environment:
       TZ: Asia/Tokyo
+      LANG: ja_JP.UTF-8
